@@ -16,7 +16,7 @@ def client_socket(data_to_send):
 
     # Connect the socket to the port where the server is listening
     server_address = './uds_socket'
-    print('connecting to %s' % server_address)
+    #print('connecting to %s' % server_address)
     try:
         sock.connect(server_address)
         sock.sendall(pickle.dumps(data_to_send))
@@ -26,7 +26,7 @@ def client_socket(data_to_send):
     except socket.error:
         pass
     finally:
-        print('closing socket')
+        #print('closing socket')
         sock.close()
 
 
@@ -54,7 +54,6 @@ class MyDaemon(Daemon):
             try:
                 connection, client_address = sock.accept()
                 data = connection.recv(256 * 1024)
-                print(sys.stderr, 'sending data back to the client')
                 print(pickle.loads(data))
                 args = pickle.loads(data)
                 if args.list_interfaces:
@@ -92,8 +91,6 @@ if __name__ == "__main__":
     group.add_argument("-ri", "--remove_interface", nargs=1, metavar='INTERFACE_NAME', help="Remove PIM interface")
     group.add_argument("-v", "--verbose", action="store_true", default=False, help="Verbose (print all debug messages)")
     args = parser.parse_args()
-
-    print(parser.parse_args())
 
     daemon = MyDaemon('/tmp/Daemon-igmp.pid')
     if args.start:

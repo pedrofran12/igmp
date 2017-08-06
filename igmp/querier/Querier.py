@@ -1,13 +1,10 @@
 from Packet.PacketIGMPHeader import PacketIGMPHeader
 from Packet.ReceivedPacket import ReceivedPacket
-from State.NonQuerier import NonQuerier
-from threading import Timer
-from utils import *
+from utils import Membership_Query, QueryResponseInterval, LastMemberQueryCount, LastMemberQueryInterval
 from ipaddress import IPv4Address
 
 
 class Querier:
-
     @staticmethod
     def general_query_timeout(router_state):
         # send general query
@@ -15,9 +12,7 @@ class Querier:
         router_state.interface.send(packet.bytes())
 
         # set general query timer
-        timer = Timer(QueryInterval, router_state.general_query_timeout)
-        timer.start()
-        router_state.general_query_timer = timer
+        router_state.set_general_query_timer()
 
     @staticmethod
     def querier_present_timeout(router_state):
@@ -35,22 +30,40 @@ class Querier:
         # if source ip of membership query lower than the ip of the received interface => change state
         # change state of interface
         # Querier -> Non Querier
-        router_state.interface_state = NonQuerier
+        router_state.change_interface_state(querier=False)
 
         # set other present querier timer
-        timer = router_state.general_query_timer
-        if timer is not None:
-            timer.cancel()
-            router_state.general_query_timer = None
+        router_state.clear_general_query_timer()
+        router_state.set_querier_present_timer()
 
-        timer = router_state.querier_present_timer
-        if timer is not None:
-            timer.cancel()
-        querier_present_timer = Timer(OtherQuerierPresentInterval, router_state.querier_present_timeout)
-        querier_present_timer.start()
-        router_state.querier_present_timer = querier_present_timer
 
     # TODO ver se existe uma melhor maneira de fazer isto
     @staticmethod
-    def name_state():
+    def state_name():
         return "Querier"
+
+    @staticmethod
+    def get_group_membership_time(max_response_time: int):
+        return LastMemberQueryInterval * LastMemberQueryCount
+
+
+    # State
+    @staticmethod
+    def get_checking_membership_state():
+        from . import CheckingMembership
+        return CheckingMembership
+
+    @staticmethod
+    def get_members_present_state():
+        from . import MembersPresent
+        return MembersPresent
+
+    @staticmethod
+    def get_no_members_present_state():
+        from . import NoMembersPresent
+        return NoMembersPresent
+
+    @staticmethod
+    def get_version_1_members_present_state():
+        from . import Version1MembersPresent
+        return Version1MembersPresent

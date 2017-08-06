@@ -73,7 +73,7 @@ class PacketIGMPHeader:
         print("checksum calculated: " + str(checksum(msg_to_checksum)))
         if checksum(msg_to_checksum) != rcv_checksum:
             print("wrong checksum")
-            raise Exception
+            raise Exception("wrong checksum")
 
 
         group_address = socket.inet_ntoa(group_address)

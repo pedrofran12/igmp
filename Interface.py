@@ -1,13 +1,12 @@
 import socket
 import struct
 import threading
-from threading import Timer
 import netifaces
 from Packet.ReceivedPacket import ReceivedPacket
 import Main
 import traceback
-
-
+if not hasattr(socket, 'SO_BINDTODEVICE'):
+    socket.SO_BINDTODEVICE = 25
 
 class Interface:
     ETH_P_IP = 0x0800		# Internet Protocol packet
@@ -15,8 +14,6 @@ class Interface:
     PACKET_MR_ALLMULTI = 2
 
     def __init__(self, interface_name: str):
-        from State.RouterState import RouterState
-
         # RECEIVE SOCKET
         rcv_s = socket.socket(socket.PF_PACKET, socket.SOCK_RAW, socket.htons(Interface.ETH_P_IP))
 
@@ -38,6 +35,7 @@ class Interface:
 
         self.interface_enabled = True
         self.interface_name = interface_name
+        from igmp.RouterState import RouterState
         self.interface_state = RouterState(self)
 
         # run receive method in background

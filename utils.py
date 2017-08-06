@@ -1,5 +1,6 @@
 import array
 
+
 def checksum(pkt: bytes) -> bytes:
     if len(pkt) % 2 == 1:
         pkt += "\0"
@@ -12,13 +13,13 @@ def checksum(pkt: bytes) -> bytes:
 # IGMP timers (in seconds)
 RobustnessVariable = 2
 QueryInterval = 125
-QueryResponseInterval = 10
-MaxResponseTime = QueryResponseInterval*10
+QueryResponseInterval = 100
+#MaxResponseTime = QueryResponseInterval*10
 GroupMembershipInterval = RobustnessVariable * QueryInterval + QueryResponseInterval
 OtherQuerierPresentInterval = RobustnessVariable * QueryInterval + QueryResponseInterval/2
 StartupQueryInterval = QueryInterval / 4
 StartupQueryCount = RobustnessVariable
-LastMemberQueryInterval = MaxResponseTime
+LastMemberQueryInterval = 10
 LastMemberQueryCount = RobustnessVariable
 UnsolicitedReportInterval = 10
 Version1RouterPresentTimeout = 400
