@@ -2,6 +2,7 @@ from threading import Timer
 from .wrapper import NoMembersPresent
 from utils import GroupMembershipInterval, LastMemberQueryInterval
 from .RouterState import RouterState
+from threading import Lock
 
 
 class GroupState:
@@ -13,6 +14,8 @@ class GroupState:
         self.timer = timer
         self.v1_host_timer = v1_host_timer
         self.retransmit_timer = retransmit_timer
+        # lock
+        self.lock = Lock()
 
     def print_state(self):
         return self.state.print_state()
@@ -66,25 +69,53 @@ class GroupState:
     # Timer timeout
     ###########################################
     def group_membership_timeout(self):
-        self.get_interface_group_state().group_membership_timeout(self)
+        self.lock.acquire()
+        try:
+            self.get_interface_group_state().group_membership_timeout(self)
+        finally:
+            self.lock.release()
 
     def group_membership_v1_timeout(self):
-        self.get_interface_group_state().group_membership_v1_timeout(self)
+        self.lock.acquire()
+        try:
+            self.get_interface_group_state().group_membership_v1_timeout(self)
+        finally:
+            self.lock.release()
 
     def retransmit_timeout(self):
-        self.get_interface_group_state().retransmit_timeout(self)
+        self.lock.acquire()
+        try:
+            self.get_interface_group_state().retransmit_timeout(self)
+        finally:
+            self.lock.release()
 
     ###########################################
     # Receive Packets
     ###########################################
     def receive_v1_membership_report(self):
-        self.get_interface_group_state().receive_v1_membership_report(self)
+        self.lock.acquire()
+        try:
+            self.get_interface_group_state().receive_v1_membership_report(self)
+        finally:
+            self.lock.release()
 
     def receive_v2_membership_report(self):
-        self.get_interface_group_state().receive_v2_membership_report(self)
+        self.lock.acquire()
+        try:
+            self.get_interface_group_state().receive_v2_membership_report(self)
+        finally:
+            self.lock.release()
 
     def receive_leave_group(self):
-        self.get_interface_group_state().receive_leave_group(self)
+        self.lock.acquire()
+        try:
+            self.get_interface_group_state().receive_leave_group(self)
+        finally:
+            self.lock.release()
 
     def receive_group_specific_query(self, max_response_time: int):
-        self.get_interface_group_state().receive_group_specific_query(self, max_response_time)
+        self.lock.acquire()
+        try:
+            self.get_interface_group_state().receive_group_specific_query(self, max_response_time)
+        finally:
+            self.lock.release()
