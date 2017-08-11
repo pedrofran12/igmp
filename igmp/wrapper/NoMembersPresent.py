@@ -1,9 +1,13 @@
-def get_state(router_state):
+from utils import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..RouterState import RouterState
+
+def get_state(router_state: 'RouterState'):
     return router_state.interface_state.get_no_members_present_state()
+
 
 def print_state():
     return "NoMembersPresent"
-
 '''
 def group_membership_timeout(group_state):
     get_state(group_state).group_membership_timeout(group_state)

@@ -8,7 +8,8 @@ import traceback
 if not hasattr(socket, 'SO_BINDTODEVICE'):
     socket.SO_BINDTODEVICE = 25
 
-class Interface:
+
+class Interface(object):
     ETH_P_IP = 0x0800		# Internet Protocol packet
 
     PACKET_MR_ALLMULTI = 2
@@ -46,11 +47,9 @@ class Interface:
     def get_ip(self):
         return netifaces.ifaddresses(self.interface_name)[netifaces.AF_INET][0]['addr']
 
-
-    def send(self, data, address="224.0.0.1"):
+    def send(self, data: bytes, address: str="224.0.0.1"):
         if self.interface_enabled:
             self.send_socket.sendto(data, (address, 0))
-
 
     def receive(self):
         while self.interface_enabled:
@@ -67,7 +66,6 @@ class Interface:
                         continue
                     print((raw_packet, x))
                     packet = ReceivedPacket(raw_packet, self)
-                    print(packet.bytes())
                     Main.igmp.receive_handle(packet)
             except Exception:
                 traceback.print_exc()

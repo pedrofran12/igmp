@@ -3,8 +3,6 @@ from prettytable import PrettyTable
 from Interface import Interface
 import time
 
-
-
 interfaces = {}  # interfaces with igmp enabled
 igmp = None
 
@@ -31,8 +29,8 @@ def list_enabled_interfaces():
     global interfaces
     t = PrettyTable(['Interface', 'IP', 'Enabled', 'State'])
     for interface in netifaces.interfaces():
-        # TODO: fix same interface with multiple ips
         try:
+            # TODO: fix same interface with multiple ips
             ip = netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr']
         except Exception:
             continue

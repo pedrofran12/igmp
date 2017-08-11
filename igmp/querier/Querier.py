@@ -1,26 +1,31 @@
 from Packet.PacketIGMPHeader import PacketIGMPHeader
 from Packet.ReceivedPacket import ReceivedPacket
 from utils import Membership_Query, QueryResponseInterval, LastMemberQueryCount, LastMemberQueryInterval
+from . import CheckingMembership, MembersPresent, Version1MembersPresent, NoMembersPresent
 from ipaddress import IPv4Address
+from utils import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..RouterState import RouterState
 
 
 class Querier:
     @staticmethod
-    def general_query_timeout(router_state):
+    def general_query_timeout(router_state: 'RouterState'):
         # send general query
-        packet = PacketIGMPHeader(type=Membership_Query, max_resp_time=QueryResponseInterval)
+        packet = PacketIGMPHeader(type=Membership_Query, max_resp_time=QueryResponseInterval*10)
         router_state.interface.send(packet.bytes())
 
         # set general query timer
         router_state.set_general_query_timer()
 
     @staticmethod
-    def querier_present_timeout(router_state):
+    def other_querier_present_timeout(router_state: 'RouterState'):
         # do nothing
         return
 
     @staticmethod
-    def receive_query(router_state, packet: ReceivedPacket):
+    def receive_query(router_state: 'RouterState', packet: ReceivedPacket):
         source_ip = packet.ip_header.ip_src
 
         # if source ip of membership query not lower than the ip of the received interface => ignore
@@ -34,7 +39,7 @@ class Querier:
 
         # set other present querier timer
         router_state.clear_general_query_timer()
-        router_state.set_querier_present_timer()
+        router_state.set_other_querier_present_timer()
 
 
     # TODO ver se existe uma melhor maneira de fazer isto
@@ -50,20 +55,16 @@ class Querier:
     # State
     @staticmethod
     def get_checking_membership_state():
-        from . import CheckingMembership
         return CheckingMembership
 
     @staticmethod
     def get_members_present_state():
-        from . import MembersPresent
         return MembersPresent
 
     @staticmethod
     def get_no_members_present_state():
-        from . import NoMembersPresent
         return NoMembersPresent
 
     @staticmethod
     def get_version_1_members_present_state():
-        from . import Version1MembersPresent
         return Version1MembersPresent

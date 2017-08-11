@@ -1,5 +1,11 @@
-def get_state(router_state):
+from utils import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..RouterState import RouterState
+
+
+def get_state(router_state: 'RouterState'):
     return router_state.interface_state.get_checking_membership_state()
+
 
 def print_state():
     return "CheckingMembership"

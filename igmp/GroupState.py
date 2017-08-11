@@ -1,19 +1,20 @@
 from threading import Timer
 from .wrapper import NoMembersPresent
-from utils import GroupMembershipInterval, LastMemberQueryInterval
-from .RouterState import RouterState
+from utils import GroupMembershipInterval, LastMemberQueryInterval, TYPE_CHECKING
 from threading import Lock
 
+if TYPE_CHECKING:
+    from .RouterState import RouterState
 
-class GroupState:
-    def __init__(self, router_state: RouterState, group_ip: str, timer: Timer=None,
-                 v1_host_timer: Timer=None, retransmit_timer: Timer = None):
+
+class GroupState(object):
+    def __init__(self, router_state: 'RouterState', group_ip: str):
         self.router_state = router_state
         self.group_ip = group_ip
         self.state = NoMembersPresent
-        self.timer = timer
-        self.v1_host_timer = v1_host_timer
-        self.retransmit_timer = retransmit_timer
+        self.timer = None
+        self.v1_host_timer = None
+        self.retransmit_timer = None
         # lock
         self.lock = Lock()
 
@@ -23,7 +24,7 @@ class GroupState:
     ###########################################
     # Set timers
     ###########################################
-    def set_timer(self, alternative=False, max_response_time=None):
+    def set_timer(self, alternative: bool=False, max_response_time: int=None):
         self.clear_timer()
         if not alternative:
             time = GroupMembershipInterval

@@ -11,10 +11,15 @@ class IGMP:
         ip_src = packet.ip_header.ip_src
         ip_dst = packet.ip_header.ip_dst
         print("ip = ", ip_src)
-        igmp_hdr = packet.igmp_header
+        igmp_hdr = packet.payload
 
         igmp_type = igmp_hdr.type
         igmp_group = igmp_hdr.group_address
+
+        # source ip can't be 0.0.0.0 or multicast
+        if ip_src == "0.0.0.0" or IPv4Address(ip_src).is_multicast:
+            return
+
         if igmp_type == Version_1_Membership_Report and ip_dst == igmp_group and IPv4Address(igmp_group).is_multicast:
             interface.interface_state.receive_v1_membership_report(packet)
         elif igmp_type == Version_2_Membership_Report and ip_dst == igmp_group and IPv4Address(igmp_group).is_multicast:

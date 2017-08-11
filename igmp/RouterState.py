@@ -1,14 +1,18 @@
-from Interface import Interface
 from Packet.PacketIGMPHeader import PacketIGMPHeader
 from Packet.ReceivedPacket import ReceivedPacket
 from threading import Timer
-from utils import Membership_Query, QueryResponseInterval, QueryInterval, OtherQuerierPresentInterval
+from utils import Membership_Query, QueryResponseInterval, QueryInterval, OtherQuerierPresentInterval, TYPE_CHECKING
 from .querier.Querier import Querier
 from .nonquerier.NonQuerier import NonQuerier
+from .GroupState import GroupState
+
+
+if TYPE_CHECKING:
+    from Interface import Interface
 
 
 class RouterState(object):
-    def __init__(self, interface: Interface):
+    def __init__(self, interface: 'Interface'):
         # interface of the router connected to the network
         self.interface = interface
 
@@ -20,7 +24,7 @@ class RouterState(object):
         self.group_state = {}
 
         # send general query
-        packet = PacketIGMPHeader(type=Membership_Query, max_resp_time=QueryResponseInterval)
+        packet = PacketIGMPHeader(type=Membership_Query, max_resp_time=QueryResponseInterval*10)
         self.interface.send(packet.bytes())
 
         # set initial general query timer
@@ -29,10 +33,10 @@ class RouterState(object):
         self.general_query_timer = timer
 
         # present timer
-        self.querier_present_timer = None
+        self.other_querier_present_timer = None
 
     # Send packet via interface
-    def send(self, data, address):
+    def send(self, data: bytes, address: str):
         self.interface.send(data, address)
 
     ############################################
@@ -51,21 +55,21 @@ class RouterState(object):
         if self.general_query_timer is not None:
             self.general_query_timer.cancel()
 
-    def set_querier_present_timer(self):
-        self.clear_querier_present_timer()
-        querier_present_timer = Timer(OtherQuerierPresentInterval, self.querier_present_timeout)
-        querier_present_timer.start()
-        self.querier_present_timer = querier_present_timer
+    def set_other_querier_present_timer(self):
+        self.clear_other_querier_present_timer()
+        other_querier_present_timer = Timer(OtherQuerierPresentInterval, self.other_querier_present_timeout)
+        other_querier_present_timer.start()
+        self.other_querier_present_timer = other_querier_present_timer
 
-    def clear_querier_present_timer(self):
-        if self.querier_present_timer is not None:
-            self.querier_present_timer.cancel()
+    def clear_other_querier_present_timer(self):
+        if self.other_querier_present_timer is not None:
+            self.other_querier_present_timer.cancel()
 
     def general_query_timeout(self):
         self.interface_state.general_query_timeout(self)
 
-    def querier_present_timeout(self):
-        self.interface_state.querier_present_timeout(self)
+    def other_querier_present_timeout(self):
+        self.interface_state.other_querier_present_timeout(self)
 
     def change_interface_state(self, querier: bool):
         if querier:
@@ -77,31 +81,29 @@ class RouterState(object):
     # group state methods
     ############################################
     def receive_v1_membership_report(self, packet: ReceivedPacket):
-        igmp_group = packet.igmp_header.group_address
+        igmp_group = packet.payload.group_address
         if igmp_group not in self.group_state:
-            from .GroupState import GroupState
             self.group_state[igmp_group] = GroupState(self, igmp_group)
 
         self.group_state[igmp_group].receive_v1_membership_report()
 
     def receive_v2_membership_report(self, packet: ReceivedPacket):
-        igmp_group = packet.igmp_header.group_address
+        igmp_group = packet.payload.group_address
         if igmp_group not in self.group_state:
-            from .GroupState import GroupState
             self.group_state[igmp_group] = GroupState(self, igmp_group)
 
         self.group_state[igmp_group].receive_v2_membership_report()
 
     def receive_leave_group(self, packet: ReceivedPacket):
-        igmp_group = packet.igmp_header.group_address
+        igmp_group = packet.payload.group_address
         if igmp_group in self.group_state:
             self.group_state[igmp_group].receive_leave_group()
 
     def receive_query(self, packet: ReceivedPacket):
         self.interface_state.receive_query(self, packet)
-        igmp_group = packet.igmp_header.group_address
+        igmp_group = packet.payload.group_address
 
         # process group specific query
         if igmp_group != "0.0.0.0" and igmp_group in self.group_state:
-            max_response_time = packet.igmp_header.max_resp_time
+            max_response_time = packet.payload.max_resp_time
             self.group_state[igmp_group].receive_group_specific_query(max_response_time)

@@ -21,10 +21,9 @@ import socket
 '''
 class PacketIpHeader:
     IP_HDR = "! BBH HH BBH 4s 4s"
-    #IP_HDR2 = "! B"
     IP_HDR_LEN = struct.calcsize(IP_HDR)
 
-    def __init__(self, ver, hdr_len, ttl, proto, ip_src, ip_dst):
+    def __init__(self, ver: int, hdr_len: int, ttl: int, proto: int, ip_src: str, ip_dst: str):
         self.version = ver
         self.hdr_length = hdr_len
         self.ttl = ttl

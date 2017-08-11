@@ -1,7 +1,7 @@
 import struct
 from utils import checksum
 import socket
-
+from .PacketPayload import PacketPayload
 '''
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -24,7 +24,7 @@ import socket
 |                       Source Address [N]                      |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 '''
-class PacketIGMPHeader:
+class PacketIGMPHeader(PacketPayload):
     IGMP_TYPE = 2
 
     IGMP_HDR = "! BB H 4s"
@@ -41,8 +41,7 @@ class PacketIGMPHeader:
     Leave_Group = 0x17
     Version_1_Membership_Report = 0x12
 
-
-    def __init__(self, type, max_resp_time, group_address="0.0.0.0"):
+    def __init__(self, type: int, max_resp_time: int, group_address: str="0.0.0.0"):
         # todo check type
         self.type = type
         self.max_resp_time = max_resp_time
@@ -75,12 +74,7 @@ class PacketIGMPHeader:
             print("wrong checksum")
             raise Exception("wrong checksum")
 
-
-        group_address = socket.inet_ntoa(group_address)
-
         igmp_hdr = igmp_hdr[PacketIGMPHeader.IGMP_HDR_LEN:]
+        group_address = socket.inet_ntoa(group_address)
         pkt = PacketIGMPHeader(type, max_resp_time, group_address)
-
-        # IGMPv3
-
         return pkt

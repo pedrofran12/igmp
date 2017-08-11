@@ -58,7 +58,7 @@ class MyDaemon(Daemon):
                 args = pickle.loads(data)
                 if args.list_interfaces:
                     connection.sendall(pickle.dumps(Main.list_enabled_interfaces()))
-                if args.list_state:
+                elif args.list_state:
                     connection.sendall(pickle.dumps(Main.list_state()))
                 elif args.add_interface:
                     Main.add_interface(args.add_interface[0])
@@ -82,13 +82,13 @@ class MyDaemon(Daemon):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='IGMP')
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-start", "--start", action="store_true", default=False, help="Start PIM")
-    group.add_argument("-stop", "--stop", action="store_true", default=False, help="Stop PIM")
-    group.add_argument("-restart", "--restart", action="store_true", default=False, help="Restart PIM")
-    group.add_argument("-li", "--list_interfaces", action="store_true", default=False, help="List All PIM Interfaces")
+    group.add_argument("-start", "--start", action="store_true", default=False, help="Start IGMP")
+    group.add_argument("-stop", "--stop", action="store_true", default=False, help="Stop IGMP")
+    group.add_argument("-restart", "--restart", action="store_true", default=False, help="Restart IGMP")
+    group.add_argument("-li", "--list_interfaces", action="store_true", default=False, help="List All IGMP Interfaces")
     group.add_argument("-ls", "--list_state", action="store_true", default=False, help="List state")
-    group.add_argument("-ai", "--add_interface", nargs=1, metavar='INTERFACE_NAME', help="Add PIM interface")
-    group.add_argument("-ri", "--remove_interface", nargs=1, metavar='INTERFACE_NAME', help="Remove PIM interface")
+    group.add_argument("-ai", "--add_interface", nargs=1, metavar='INTERFACE_NAME', help="Add IGMP interface")
+    group.add_argument("-ri", "--remove_interface", nargs=1, metavar='INTERFACE_NAME', help="Remove IGMP interface")
     group.add_argument("-v", "--verbose", action="store_true", default=False, help="Verbose (print all debug messages)")
     args = parser.parse_args()
 

@@ -1,11 +1,11 @@
-from Packet.PacketIpHeader import PacketIpHeader
-from Packet.PacketIGMPHeader import PacketIGMPHeader
+from .PacketIpHeader import PacketIpHeader
+from .PacketPayload import PacketPayload
 
 
-class Packet:
-    def __init__(self, ip_header: PacketIpHeader = None, igmp_header: PacketIGMPHeader = None):
+class Packet(object):
+    def __init__(self, ip_header: PacketIpHeader = None, payload: PacketPayload = None):
         self.ip_header = ip_header
-        self.igmp_header = igmp_header
+        self.payload = payload
 
-    def bytes(self):
-        return self.igmp_header.bytes()
+    def bytes(self) -> bytes:
+        return self.payload.bytes()
