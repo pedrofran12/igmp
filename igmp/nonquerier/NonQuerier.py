@@ -45,7 +45,7 @@ class NonQuerier:
 
     @staticmethod
     def get_group_membership_time(max_response_time: int):
-        return max_response_time * LastMemberQueryCount
+        return (max_response_time/10.0) * LastMemberQueryCount
 
     # State
     @staticmethod
