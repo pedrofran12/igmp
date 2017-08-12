@@ -1,0 +1,6 @@
+router1: switch1
+router2: switch1 router1
+
+client1: switch1 router1
+client2: switch1 router1
+client3: switch1 router1
