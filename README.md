@@ -36,6 +36,7 @@ This implementation was performed during my Master thesis and has since then bee
 from igmp import InterfaceIGMP
 
 intf = InterfaceIGMP(interface_name="eth0") 
+intf.enable()  # start receiving igmp packets
 
 # get information from a given multicast group
 multicast_group_obj = intf.interface_state.get_group_state(group_ip="224.10.11.12")
