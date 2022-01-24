@@ -66,4 +66,6 @@ multicast_group_obj.add_multicast_routing_entry(notifier)
 # if you no longer want to monitor the interest of 224.10.11.12, remove the
 # notifier from the group
 multicast_group_obj.remove_multicast_routing_entry(notifier)
+
+intf.remove()  # stop receiving igmp packets
 ```
