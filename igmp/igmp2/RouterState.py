@@ -173,3 +173,5 @@ class RouterState(object):
         """
         for group in self.group_state.values():
             group.remove()
+        self.clear_general_query_timer()
+        self.clear_other_querier_present_timer()
