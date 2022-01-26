@@ -1,6 +1,7 @@
 import logging
 from threading import Lock
 from threading import Timer
+from ipaddress import IPv4Address
 
 from . import igmp_globals
 from igmp.utils import TYPE_CHECKING
@@ -21,11 +22,15 @@ class GroupState(object):
 
         #timers and state
         self.router_state = router_state
-        self.group_ip = group_ip
         self.state = NoMembersPresent
         self.timer = None
         self.v1_host_timer = None
         self.retransmit_timer = None
+
+        if not IPv4Address(group_ip).is_multicast:
+            raise ValueError(group_ip + ' is not a multicast address')
+        self.group_ip = group_ip
+
         # lock
         self.lock = Lock()
 
