@@ -6,7 +6,6 @@ if len(sys.argv) >= 2 and sys.argv[1] == "install" and sys.version_info < (3, 2)
     raise SystemExit("Python 3.2 or higher is required")
 
 
-dependencies = open("requirements.txt", "r").read().splitlines()
 setup(
     name="igmp",
     description="IGMPv2 router-side protocol implementation for Python",
@@ -18,7 +17,11 @@ setup(
     author="Pedro Oliveira",
     author_email="pedro.francisco.oliveira@tecnico.ulisboa.pt",
     license="MIT",
-    install_requires=dependencies,
+    install_requires=[
+        'PrettyTable',
+        'netifaces',
+        'ipaddress',
+    ],
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
