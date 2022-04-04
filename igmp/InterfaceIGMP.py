@@ -26,7 +26,11 @@ class InterfaceIGMP(Interface):
     ]
 
     def __init__(self, interface_name: str, vif_index: int = 0):
-        self.ip_interface = netifaces.ifaddresses(interface_name)[netifaces.AF_INET][0]['addr']
+        if_addr_dict = netifaces.ifaddresses(interface_name)
+        if not netifaces.AF_INET in if_addr_dict:
+            raise Exception("Adding IGMP interface failed because %s does not "
+                            "have any ipv4 address" % interface_name)
+        self.ip_interface = if_addr_dict[netifaces.AF_INET][0]['addr']
 
         # SEND SOCKET
         snd_s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_IGMP)
