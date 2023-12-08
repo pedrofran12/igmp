@@ -18,7 +18,7 @@ setup(
     author_email="pedro.francisco.oliveira@tecnico.ulisboa.pt",
     license="MIT",
     install_requires=[
-        'netifaces',
+        'netifaces2',
         'ipaddress',
     ],
     packages=find_packages(),
